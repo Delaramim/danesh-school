@@ -1,0 +1,71 @@
+---
+// Cut-paper style shapes drawn from the school's three celebrations.
+interface Props {
+  name: 'sun' | 'pomegranate' | 'fish' | 'star' | 'leaf' | 'watermelon';
+  class?: string;
+}
+const { name, class: className } = Astro.props;
+---
+
+<svg class:list={['shape', className]} viewBox="0 0 120 120" aria-hidden="true">
+  {name === 'sun' && (
+    <g>
+      <g fill="var(--saffron)">
+        {Array.from({ length: 12 }, (_, i) => (
+          <path d="M60 4 L66 22 L54 22 Z" transform={`rotate(${i * 30} 60 60)`} />
+        ))}
+      </g>
+      <circle cx="60" cy="60" r="32" fill="var(--saffron)" />
+      <circle cx="49" cy="56" r="3.5" fill="var(--ink)" />
+      <circle cx="71" cy="56" r="3.5" fill="var(--ink)" />
+      <path d="M48 68 Q60 80 72 68" fill="none" stroke="var(--ink)" stroke-width="4" stroke-linecap="round" />
+      <circle cx="42" cy="66" r="4" fill="var(--blush)" />
+      <circle cx="78" cy="66" r="4" fill="var(--blush)" />
+    </g>
+  )}
+  {name === 'pomegranate' && (
+    <g>
+      <path d="M50 22 L54 8 L60 18 L66 8 L70 22 Z" fill="var(--pomegranate-dark)" />
+      <circle cx="60" cy="66" r="44" fill="var(--pomegranate)" />
+      <ellipse cx="44" cy="50" rx="10" ry="6" fill="#fff" opacity=".25" transform="rotate(-30 44 50)" />
+      <g fill="var(--blush)">
+        <circle cx="70" cy="70" r="4" /><circle cx="80" cy="80" r="4" /><circle cx="62" cy="84" r="4" /><circle cx="76" cy="58" r="3" />
+      </g>
+    </g>
+  )}
+  {name === 'fish' && (
+    <g>
+      <path d="M96 60 L118 40 L114 60 L118 80 Z" fill="var(--saffron-dark)" />
+      <ellipse cx="60" cy="60" rx="42" ry="28" fill="var(--orange)" />
+      <path d="M50 34 Q62 18 74 34" fill="var(--saffron-dark)" />
+      <circle cx="36" cy="54" r="5" fill="#fff" />
+      <circle cx="35" cy="54" r="2.6" fill="var(--ink)" />
+      <path d="M60 46 Q68 60 60 74 M72 46 Q80 60 72 74" fill="none" stroke="var(--saffron-dark)" stroke-width="3" stroke-linecap="round" />
+      <circle cx="10" cy="40" r="4" fill="none" stroke="var(--firuzeh)" stroke-width="2.5" />
+      <circle cx="4" cy="26" r="2.5" fill="none" stroke="var(--firuzeh)" stroke-width="2" />
+    </g>
+  )}
+  {name === 'star' && (
+    <g fill="var(--firuzeh)">
+      <rect x="28" y="28" width="64" height="64" rx="6" />
+      <rect x="28" y="28" width="64" height="64" rx="6" transform="rotate(45 60 60)" />
+      <circle cx="60" cy="60" r="14" fill="var(--paper)" />
+    </g>
+  )}
+  {name === 'leaf' && (
+    <g>
+      <path d="M20 100 Q20 20 100 20 Q100 100 20 100 Z" fill="var(--leaf)" />
+      <path d="M24 96 L88 32" stroke="var(--paper)" stroke-width="4" stroke-linecap="round" />
+    </g>
+  )}
+  {name === 'watermelon' && (
+    <g>
+      <path d="M8 40 A52 52 0 0 0 112 40 Z" fill="var(--leaf)" />
+      <path d="M16 40 A44 44 0 0 0 104 40 Z" fill="var(--paper)" />
+      <path d="M22 40 A38 38 0 0 0 98 40 Z" fill="var(--pomegranate)" />
+      <g fill="var(--ink)">
+        <ellipse cx="44" cy="54" rx="2.5" ry="4" /><ellipse cx="60" cy="62" rx="2.5" ry="4" /><ellipse cx="76" cy="54" rx="2.5" ry="4" />
+      </g>
+    </g>
+  )}
+</svg>

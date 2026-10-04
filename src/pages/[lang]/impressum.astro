@@ -1,0 +1,30 @@
+---
+import Base from '../../layouts/Base.astro';
+import { langs, type Lang } from '../../i18n/ui';
+
+export function getStaticPaths() {
+  return langs.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+---
+
+<!-- Legal text stays in German, as required in Austria. Fill in once the client sends the details. -->
+<Base lang={lang} title="Impressum">
+  <section class="section page-top legal" dir="ltr" lang="de">
+    <h1>Impressum</h1>
+    <p>
+      [Name des Vereins]<br />
+      Mariahilfer Straße [Nr.], 1060 Wien<br />
+      ZVR-Zahl: [ZVR]<br />
+      E-Mail: [E-Mail]
+    </p>
+    <p>Vertretungsbefugt: [Obfrau / Obmann]</p>
+
+    <h2 id="privacy">Datenschutz</h2>
+    <p>
+      Wenn Sie uns über das Kontaktformular schreiben, verwenden wir Ihre Angaben nur, um Ihre Anfrage zu beantworten.
+      Wir geben sie nicht weiter. [Vollständige Datenschutzerklärung folgt.]
+    </p>
+  </section>
+</Base>

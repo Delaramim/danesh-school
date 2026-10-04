@@ -1,0 +1,109 @@
+---
+import '../styles/global.css';
+import { languages, langs, dirs, useT, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  title?: string;
+}
+const { lang, title } = Astro.props;
+const t = useT(lang);
+
+// Path after the language segment, so switching keeps you on the same page.
+const rest = Astro.url.pathname.split('/').slice(2).join('/');
+const pageTitle = title ? `${title} | ${t('school.name')}` : t('meta.title');
+
+const shortNames: Record<Lang, string> = { fa: 'فا', de: 'DE', en: 'EN' };
+const navLinks = [
+  { href: `/${lang}/#programs`, label: t('nav.programs') },
+  { href: `/${lang}/#culture`, label: t('nav.culture') },
+  { href: `/${lang}/events/`, label: t('nav.events') },
+];
+---
+
+<!doctype html>
+<html lang={lang} dir={dirs[lang]}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={t('meta.description')} />
+    {langs.map((l) => <link rel="alternate" hreflang={l} href={`/${l}/${rest}`} />)}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;700;800&family=Lalezar&family=Vazirmatn:wght@400;500;700&family=Nunito:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="logo" href={`/${lang}/`}>
+        <span class="logo-mark" aria-hidden="true">د</span>
+        <span class="logo-long">{t('school.name')}</span>
+        <span class="logo-short">{t('school.short')}</span>
+      </a>
+      <nav class="main-nav" aria-label="Main">
+        {navLinks.map((link) => <a href={link.href}>{link.label}</a>)}
+      </nav>
+      <div class="header-end">
+        <nav class="lang-switch" aria-label={t('lang.label')}>
+          {langs.map((l) => (
+            <a
+              href={`/${l}/${rest}`}
+              lang={l}
+              hreflang={l}
+              data-lang={l}
+              aria-current={l === lang ? 'true' : undefined}
+            >
+              <span class="lang-long">{languages[l]}</span>
+              <span class="lang-short" aria-hidden="true">{shortNames[l]}</span>
+            </a>
+          ))}
+        </nav>
+        <a class="btn btn-small header-cta" href={`/${lang}/#contact`}>{t('nav.contact')}</a>
+        <details class="mobile-menu">
+          <summary aria-label="Menu"><span></span></summary>
+          <nav class="menu-panel" aria-label="Main">
+            {navLinks.map((link) => <a href={link.href}>{link.label}</a>)}
+            <a class="btn" href={`/${lang}/#contact`}>{t('cta.contact')}</a>
+          </nav>
+        </details>
+      </div>
+    </header>
+
+    <!-- Roughens edges of the illustrations so they read as cut paper, not clip art. -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <filter id="paper-edge">
+        <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="7" />
+        <feDisplacementMap in="SourceGraphic" scale="3.5" />
+      </filter>
+    </svg>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <p class="footer-name">{t('school.name')}</p>
+      <p>{t('contact.street')}, {t('contact.city')}</p>
+      <p class="footer-links">
+        <a href={`/${lang}/impressum/`}>{t('footer.impressum')}</a>
+        <a href={`/${lang}/impressum/#privacy`}>{t('footer.privacy')}</a>
+      </p>
+    </footer>
+
+    <script is:inline>
+      // Remember the language a parent picks, so the root page sends them back to it.
+      document.querySelectorAll('.lang-switch a').forEach((a) =>
+        a.addEventListener('click', () => {
+          try { localStorage.setItem('lang', a.dataset.lang); } catch {}
+        })
+      );
+      // Close the mobile menu after a link is tapped.
+      document.querySelectorAll('.menu-panel a').forEach((a) =>
+        a.addEventListener('click', () => a.closest('details').removeAttribute('open'))
+      );
+    </script>
+  </body>
+</html>

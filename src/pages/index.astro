@@ -1,0 +1,28 @@
+---
+// Root URL: send parents to their saved language, or guess from the browser.
+---
+
+<!doctype html>
+<html lang="fa">
+  <head>
+    <meta charset="utf-8" />
+    <title>مدرسه فارسی دانش</title>
+    <script is:inline>
+      (function () {
+        var supported = ['fa', 'de', 'en'];
+        var pick = null;
+        try { pick = localStorage.getItem('lang'); } catch (e) {}
+        if (supported.indexOf(pick) === -1) {
+          var prefs = navigator.languages || [navigator.language || ''];
+          for (var i = 0; i < prefs.length && !pick; i++) {
+            var code = String(prefs[i]).slice(0, 2).toLowerCase();
+            if (supported.indexOf(code) !== -1) pick = code;
+          }
+        }
+        location.replace('/' + (pick || 'fa') + '/');
+      })();
+    </script>
+    <meta http-equiv="refresh" content="1;url=/fa/" />
+  </head>
+  <body></body>
+</html>

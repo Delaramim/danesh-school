@@ -1,0 +1,183 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Shape from '../../components/Shape.astro';
+import PostCard from '../../components/PostCard.astro';
+import { langs, useT, type Lang } from '../../i18n/ui';
+
+export function getStaticPaths() {
+  return langs.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const t = useT(lang);
+
+// Upcoming events first, then the newest news, three in total.
+const now = new Date();
+const posts = await getCollection('posts');
+const upcoming = posts.filter((p) => p.data.date >= now).sort((a, b) => +a.data.date - +b.data.date);
+const past = posts.filter((p) => p.data.date < now).sort((a, b) => +b.data.date - +a.data.date);
+const featured = [...upcoming, ...past].slice(0, 3);
+
+// Words wrapped in [brackets] in the title get the crayon underline.
+const titleParts = t('hero.title').split(/\[(.+?)\]/);
+
+// TODO: drop a class photo at public/images/hero.jpg and set this to '/images/hero.jpg'.
+const heroPhoto: string | null = null;
+
+const mapUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('Mariahilfer Straße, 1060 Wien');
+---
+
+<Base lang={lang}>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">{t('hero.eyebrow')}</p>
+      <h1>
+        {titleParts.map((part, i) => (i % 2 ? <span class="scribble">{part}</span> : part))}
+      </h1>
+      <p class="lead">{t('hero.lead')}</p>
+      <div class="hero-actions">
+        <a class="btn" href="#contact">{t('cta.contact')}</a>
+        <a class="btn btn-ghost" href="#programs">{t('cta.programs')}</a>
+      </div>
+    </div>
+
+    <div class="hero-art" aria-hidden="true">
+      <div class="arch">
+        {heroPhoto ? <img src={heroPhoto} alt="" /> : <span class="arch-letters">الف ب پ</span>}
+      </div>
+      <Shape name="sun" class="float f-sun" />
+      <Shape name="pomegranate" class="float f-pom" />
+      <Shape name="fish" class="float f-fish" />
+      <Shape name="star" class="float f-star" />
+    </div>
+  </section>
+
+  <!-- Quick facts -->
+  <ul class="facts">
+    <li class="fact tone-saffron"><span>{t('fact.when.label')}</span><strong>{t('fact.when.value')}</strong></li>
+    <li class="fact tone-firuzeh"><span>{t('fact.age.label')}</span><strong>{t('fact.age.value')}</strong></li>
+    <li class="fact tone-pomegranate"><span>{t('fact.where.label')}</span><strong>{t('fact.where.value')}</strong></li>
+  </ul>
+
+  <!-- Programs -->
+  <section class="section" id="programs">
+    <div class="section-head">
+      <h2>{t('programs.title')}</h2>
+      <p>{t('programs.lead')}</p>
+    </div>
+    <div class="programs">
+      <article class="program tone-firuzeh">
+        <Shape name="star" class="program-icon" />
+        <span class="pill">{t('p1.tag')}</span>
+        <h3>{t('p1.title')}</h3>
+        <p>{t('p1.text')}</p>
+      </article>
+      <article class="program tone-saffron">
+        <Shape name="sun" class="program-icon" />
+        <span class="pill">{t('p2.tag')}</span>
+        <h3>{t('p2.title')}</h3>
+        <p>{t('p2.text')}</p>
+      </article>
+      <article class="program tone-pomegranate">
+        <Shape name="leaf" class="program-icon" />
+        <span class="pill">{t('p3.tag')}</span>
+        <h3>{t('p3.title')}</h3>
+        <p>{t('p3.text')}</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- Culture -->
+  <section class="section culture" id="culture">
+    <div class="section-head">
+      <h2>{t('culture.title')}</h2>
+      <p>{t('culture.lead')}</p>
+    </div>
+    <ol class="seasons">
+      <li class="season tone-saffron">
+        <Shape name="sun" />
+        <span>{t('c.mehregan.season')}</span>
+        <strong>{t('c.mehregan')}</strong>
+      </li>
+      <li class="season tone-pomegranate">
+        <Shape name="watermelon" />
+        <span>{t('c.yalda.season')}</span>
+        <strong>{t('c.yalda')}</strong>
+      </li>
+      <li class="season tone-firuzeh">
+        <Shape name="fish" />
+        <span>{t('c.nowruz.season')}</span>
+        <strong>{t('c.nowruz')}</strong>
+      </li>
+    </ol>
+  </section>
+
+  <!-- Events & news -->
+  <section class="section" id="events">
+    <div class="section-head row">
+      <h2>{t('events.title')}</h2>
+      <a class="link-arrow" href={`/${lang}/events/`}>{t('events.all')}</a>
+    </div>
+    <div class="posts">
+      {featured.map((post) => <PostCard post={post} lang={lang} />)}
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section class="section contact" id="contact">
+    <div class="contact-intro">
+      <h2>{t('contact.title')}</h2>
+      <p>{t('contact.lead')}</p>
+      <div class="address">
+        <span>{t('contact.address')}</span>
+        <p>{t('contact.street')}<br />{t('contact.city')}</p>
+        <a class="link-arrow" href={mapUrl} target="_blank" rel="noopener">{t('contact.map')}</a>
+      </div>
+      <Shape name="pomegranate" class="contact-shape" />
+    </div>
+
+    <form class="form" name="inquiry" method="POST" action={`/${lang}/thanks/`} data-netlify="true" netlify-honeypot="company">
+      <input type="hidden" name="form-name" value="inquiry" />
+      <input type="hidden" name="language" value={lang} />
+      <p class="hp"><label>Company <input name="company" tabindex="-1" autocomplete="off" /></label></p>
+
+      <div class="field-row">
+        <label>{t('form.parent')}<input name="name" required autocomplete="name" /></label>
+        <label>{t('form.age')}<input name="child_age" type="number" min="2" max="18" inputmode="numeric" /></label>
+      </div>
+      <div class="field-row">
+        <label>{t('form.email')}<input name="email" type="email" required autocomplete="email" dir="ltr" /></label>
+        <label>{t('form.phone')}<input name="phone" type="tel" autocomplete="tel" dir="ltr" /></label>
+      </div>
+
+      <fieldset>
+        <legend>{t('form.level')}</legend>
+        <div class="chips">
+          {(['none', 'some', 'fluent', 'reads'] as const).map((level, i) => (
+            <label class="chip">
+              <input type="radio" name="farsi_level" value={level} checked={i === 0} />
+              <span>{t(`form.level.${level}`)}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <label>{t('form.message')}<textarea name="message" rows="4"></textarea></label>
+
+      <label class="consent">
+        <input type="checkbox" name="consent" required />
+        <span>{t('form.consent')} <a href={`/${lang}/impressum/#privacy`}>{t('form.privacy')}</a></span>
+      </label>
+
+      <button class="btn" type="submit">{t('form.submit')}</button>
+    </form>
+  </section>
+
+  <!-- Closing -->
+  <section class="closing">
+    <Shape name="star" class="closing-star" />
+    <p>{t('closing')}</p>
+  </section>
+</Base>

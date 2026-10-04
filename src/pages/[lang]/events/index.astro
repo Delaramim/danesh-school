@@ -1,0 +1,40 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import PostCard from '../../../components/PostCard.astro';
+import { langs, useT, type Lang } from '../../../i18n/ui';
+
+export function getStaticPaths() {
+  return langs.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const t = useT(lang);
+
+const now = new Date();
+const posts = await getCollection('posts');
+const upcoming = posts.filter((p) => p.data.date >= now).sort((a, b) => +a.data.date - +b.data.date);
+const past = posts.filter((p) => p.data.date < now).sort((a, b) => +b.data.date - +a.data.date);
+---
+
+<Base lang={lang} title={t('events.title')}>
+  <section class="section page-top">
+    <div class="section-head">
+      <h1>{t('events.title')}</h1>
+    </div>
+
+    <h2 class="list-label">{t('events.upcoming')}</h2>
+    {upcoming.length ? (
+      <div class="posts">{upcoming.map((post) => <PostCard post={post} lang={lang} />)}</div>
+    ) : (
+      <p>{t('events.empty')}</p>
+    )}
+
+    {past.length > 0 && (
+      <>
+        <h2 class="list-label">{t('events.past')}</h2>
+        <div class="posts">{past.map((post) => <PostCard post={post} lang={lang} />)}</div>
+      </>
+    )}
+  </section>
+</Base>
